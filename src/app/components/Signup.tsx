@@ -83,7 +83,15 @@ export default function Signup() {
       router.replace("/home");
     } catch (e: any) {
       setLoading(false);
-      toast.error(e?.response?.data?.error || "Error signing up");
+      if (e?.response?.data?.error) toast.error(e?.response?.data?.error);
+      else if (e?.response?.data?.validation_errors) {
+        const validation_errors = e?.response?.data?.validation_errors as {
+          msg: string;
+        }[];
+        for (const i of validation_errors) {
+          toast.error(i.msg);
+        }
+      } else toast.error("Error signing up");
     }
   };
 
@@ -245,7 +253,6 @@ export default function Signup() {
           id={FormState.password}
           required
           ref={passwordRef}
-          minLength={6}
           value={stages.password}
           onChange={handleStateChange("password")}
           placeholder="Sample@123"
